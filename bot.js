@@ -19,11 +19,11 @@ function advice(equity, last_raise, expected_pot) {
         // check if raise is viable
         if ((equity_diff / 100) * expected_pot > (last_raise * 2)) {
             let raise = roundUpToNearest10((equity_diff / 100) * expected_pot);
-            answer = `raise to ${raise}: `;
+            answer = `raise to ${raise} (${100-bluff_freq}): call (${bluff_freq})`;
         }
         else {
             if (last_raise > 0) {
-                answer = `call ${last_raise}`;
+                answer = `call ${last_raise} (${roundUpToNearest10(equity)}), raise (${100-roundUpToNearest10(equity/2)})`;
             }
             else {
                 answer = "check";

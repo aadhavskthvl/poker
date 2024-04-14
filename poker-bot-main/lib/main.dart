@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +14,8 @@ class MyApp extends StatelessWidget {
       title: 'Poker Hand Evaluator',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        useMaterial3: true,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: Color(0xFF303030), // Nice dark grey
       ),
       home: const PokerHandPage(title: 'Poker Hand Evaluator'),
     );
