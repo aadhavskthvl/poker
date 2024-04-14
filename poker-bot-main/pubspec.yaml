@@ -33,6 +33,7 @@ dependencies:
   flutter_js: ^0.8.0
   http: ^1.2.1
   webview_flutter: ^3.0.0
+  firebase_core: ^1.10.0
 
 
 

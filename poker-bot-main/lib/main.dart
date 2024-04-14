@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -33,6 +32,31 @@ class PokerHandPage extends StatefulWidget {
 class _PokerHandPageState extends State<PokerHandPage> {
   final List<bool> activePlayers = List<bool>.generate(5, (_) => true);
   int currentRaise = 0;
+  List<String> cardNumbers = [
+    'A',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    'J',
+    'Q',
+    'K'
+  ];
+  List<String> cardSuits = [
+    's',
+    'h',
+    'd',
+    'c'
+  ]; // Spades, Hearts, Diamonds, Clubs
+  int card1Index = 0;
+  int card2Index = 0;
+  int card1SuitIndex = 0; // Starts with Spades
+  int card2SuitIndex = 1; // Starts with Hearts
 
   void togglePlayer(int index) {
     setState(() {
@@ -40,42 +64,58 @@ class _PokerHandPageState extends State<PokerHandPage> {
     });
   }
 
-  Widget playerIcon(int index) {
-    return GestureDetector(
-      onTap: () => togglePlayer(index),
-      child: Icon(
-        activePlayers[index] ? Icons.person : Icons.person_off,
-        size: 50,
-        color: activePlayers[index] ? Colors.green : Colors.red,
-      ),
-    );
+  void changeCard(int cardIndex, bool isNext, bool isNumberChange) {
+    setState(() {
+      if (isNumberChange) {
+        if (cardIndex == 1) {
+          card1Index = isNext
+              ? (card1Index + 1) % cardNumbers.length
+              : (card1Index - 1 + cardNumbers.length) % cardNumbers.length;
+        } else {
+          card2Index = isNext
+              ? (card2Index + 1) % cardNumbers.length
+              : (card2Index - 1 + cardNumbers.length) % cardNumbers.length;
+        }
+      } else {
+        if (cardIndex == 1) {
+          card1SuitIndex = isNext
+              ? (card1SuitIndex + 1) % cardSuits.length
+              : (card1SuitIndex - 1 + cardSuits.length) % cardSuits.length;
+        } else {
+          card2SuitIndex = isNext
+              ? (card2SuitIndex + 1) % cardSuits.length
+              : (card2SuitIndex - 1 + cardSuits.length) % cardSuits.length;
+        }
+      }
+    });
   }
 
-  Future<void> submitData() async {
-    // Create the request data
-    final requestData = {
-      'card': 'assets/As.png', // Replace this with your card widget source name
-      'players': activePlayers.where((player) => player).length.toString(),
-      'raise': currentRaise.toString(),
-    };
+  Widget swipeableCard(int cardIndex) {
+    int numberIndex = cardIndex == 1 ? card1Index : card2Index;
+    int suitIndex = cardIndex == 1 ? card1SuitIndex : card2SuitIndex;
+    String cardAssetPath =
+        'assets/${cardNumbers[numberIndex]}${cardSuits[suitIndex]}.png';
 
-
-    try {
-      // Send the POST request
-      final response = await http.post(
-        Uri.parse('http://localhost:3000/submitData'), // Replace this with your server URL
-        body: requestData,
-      );
-
-      // Check the status code for a successful response
-      if (response.statusCode == 200) {
-        print('Data submitted successfully');
-      } else {
-        print('Failed to submit data');
-      }
-    } catch (e) {
-      print('An error occurred: $e');
-    }
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        if (details.primaryVelocity! < 0) {
+          changeCard(cardIndex, true, true);
+        } else if (details.primaryVelocity! > 0) {
+          changeCard(cardIndex, false, true);
+        }
+      },
+      onVerticalDragEnd: (details) {
+        if (details.primaryVelocity! > 0) {
+          changeCard(cardIndex, true, false);
+        } else if (details.primaryVelocity! < 0) {
+          changeCard(cardIndex, false, false);
+        }
+      },
+      child: Padding(
+        padding: EdgeInsets.all(4.0),
+        child: Image.asset(cardAssetPath, fit: BoxFit.cover, height: 200),
+      ),
+    );
   }
 
   @override
@@ -98,17 +138,10 @@ class _PokerHandPageState extends State<PokerHandPage> {
             const SizedBox(height: 50),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children:  [
-                Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Image.asset('assets/As.png', // Card 1
-                        fit: BoxFit.cover, height: 200)),// Card 1
-                SizedBox(width: 10),
-                Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Image.asset('assets/Ah.png', // Card 1
-                        fit: BoxFit.cover, height: 200)),// Card 1
-                SizedBox(width: 10), // Card 2
+              children: [
+                swipeableCard(1), // Card 1
+                SizedBox(width: 5), // Reduced space between cards
+                swipeableCard(2), // Card 2
               ],
             ),
             const SizedBox(height: 50),
@@ -131,11 +164,22 @@ class _PokerHandPageState extends State<PokerHandPage> {
               color: Colors.blue,
               icon: Icons.play_arrow,
               label: 'Submit',
-              onPressed: submitData,
+              onPressed: () {},
             ),
             const SizedBox(height: 50),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget playerIcon(int index) {
+    return GestureDetector(
+      onTap: () => togglePlayer(index),
+      child: Icon(
+        activePlayers[index] ? Icons.person : Icons.person_off,
+        size: 50,
+        color: activePlayers[index] ? Colors.green : Colors.red,
       ),
     );
   }
@@ -160,22 +204,15 @@ class ButtonWithText extends StatelessWidget {
     return Column(
       children: [
         IconButton(
-          icon: Icon(icon, size: 50), // Increase the size here
+          icon: Icon(icon, size: 50),
           color: color,
           onPressed: onPressed,
         ),
         Text(
           label,
-          style: TextStyle(color: color, fontSize: 20), // Increase the font size here
+          style: TextStyle(color: color, fontSize: 20),
         ),
       ],
     );
   }
 }
-
-
-
-
-
-
-

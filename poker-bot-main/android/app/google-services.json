@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "392742535424",
+    "project_id": "poker-bot-4e985",
+    "storage_bucket": "poker-bot-4e985.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:392742535424:android:26e168ef1a8cd54d54f3e5",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCA5OqEDssyFCs2molrzGM6Q8sI-N851NU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
